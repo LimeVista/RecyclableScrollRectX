@@ -58,16 +58,32 @@ namespace RecyclableScrollRectX
                     _dataSource = value;
                 }
 
-                NotifyDataSetChanged();
+                DataSetChanged();
             }
         }
 
         /// <summary>
-        /// 数据发生改变
+        /// 数据源发生大改变，重置整个滑动列表
         /// </summary>
-        public void NotifyDataSetChanged()
+        public void DataSetChanged()
         {
-            // TODO
+            // TODO 需要实现位置、状态的保留
+        }
+
+        /// <summary>
+        /// 刷新可见单元（会触发可视视图重新绑定）
+        /// 
+        /// 用于数据状态发生改变，但数据源未发生增删改
+        /// </summary>
+        public void RefreshVisibleCells()
+        {
+            RecyclingSystemDelegate @delegate;
+            if (RecyclingSystem == null || (@delegate = RecyclingSystem.InternalDelegate) == null) return;
+
+            foreach (var item in @delegate.UsedPool)
+            {
+                @delegate.DataSource.OnBindCell(item.Cell.Cell, item.Index);
+            }
         }
 
         protected override bool AllowHorizontal
