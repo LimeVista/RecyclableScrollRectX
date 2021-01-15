@@ -193,6 +193,89 @@ namespace RecyclableScrollRectX
             }
         }
 
+        public override void OnDataSetChanged(AbsRecyclableScrollRect scrollRect)
+        {
+            OnScrollToNormalizedPosition(scrollRect, scrollRect.horizontalNormalizedPosition);
+        }
+
+        public override void OnScrollToNormalizedPosition(AbsRecyclableScrollRect scrollRect, float normalized)
+        {
+            var dataSource = Delegate.DataSource;
+            var contentWidth = Delegate.Content.rect.width;
+            var viewportWidth = Delegate.Viewport.rect.width;
+            var posX = 0f;
+            if (contentWidth > viewportWidth)
+            {
+                normalized = Mathf.Clamp(normalized, 0f, 1f);
+                posX = normalized * (contentWidth - viewportWidth);
+            }
+
+            _prevOffset = posX;
+            var min = posX - _edge;
+            var max = posX + _edge + viewportWidth;
+
+            var zygote = Delegate.GetCellZygote(0);
+            var cellHeight = zygote.FixedHeight;
+            var cellWidth = zygote.FixedWidth;
+
+            foreach (var item in Delegate.UsedPool)
+            {
+                var tf = item.Cell.Transform;
+                var edge = tf.anchoredPosition.x + tf.rect.width;
+                if (min <= edge) break;
+                _recyclingPool.Add(item);
+            }
+
+            RecyclingCellFromList();
+
+            for (var i = Delegate.UsedPool.Count - 1; i >= 0; i--)
+            {
+                var item = Delegate.UsedPool[i];
+                var tf = item.Cell.Transform;
+                var edge = tf.anchoredPosition.x;
+                if (max >= edge) break;
+                _recyclingPool.Add(item);
+            }
+
+            RecyclingCellFromList();
+
+            var existMinIndex = int.MaxValue;
+            var existMaxIndex = int.MinValue;
+            if (Delegate.UsedPool.Count > 0)
+            {
+                existMinIndex = Delegate.LittleIndexFromUsedPool().Index;
+                existMaxIndex = Delegate.BigIndexFromUsedPool().Index;
+            }
+
+            var minCol = Mathf.Max((int) (min / cellWidth), 0);
+            var offset = cellWidth * minCol;
+            var index = minCol * Row;
+
+            var cellCount = dataSource.GetCellCount();
+            while (index < cellCount && max >= offset + cellWidth)
+            {
+                // 填充行
+                var col = index / Row;
+                while (col == index / Row && index < cellCount)
+                {
+                    if (existMinIndex <= index && existMaxIndex >= index)
+                    {
+                        index++;
+                        var curCol = index / Row;
+                        offset = curCol * cellWidth;
+                        continue;
+                    }
+
+                    var cur = PopCachedPoolPoolAndPushToUsedPool(index, cellWidth, cellHeight, col);
+                    dataSource.OnBindCell(cur.Cell.Cell, index);
+                    offset = Mathf.Abs(cur.Offset);
+                    index++;
+                }
+            }
+
+            scrollRect.horizontalNormalizedPosition = normalized;
+        }
+
         #endregion
 
         #region 私有方法

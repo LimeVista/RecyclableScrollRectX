@@ -40,6 +40,7 @@ namespace RecyclableScrollRectX
 
         /// <summary>
         /// 计算内容在滑动方向的长度，此接口开销不小，请勿频繁请求
+        /// 规定：这里的唯一为正方向距离（总是大于等于0）
         /// </summary>
         /// <returns>长度</returns>
         public abstract float CalcContentLengthOfSlidingDirection();
@@ -75,5 +76,18 @@ namespace RecyclableScrollRectX
         /// <param name="scrollRect">滑动部件</param>
         /// <param name="v"><see cref="UnityEngine.UI.ScrollRect.onValueChanged"/></param>
         public abstract void OnValueChanged(AbsRecyclableScrollRect scrollRect, Vector2 v);
+
+        /// <summary>
+        /// <see cref="RecyclingSystem.OnDataSetChanged(AbsRecyclableScrollRect)"/>
+        /// </summary>
+        /// <param name="scrollRect">滑动列表</param>
+        public abstract void OnDataSetChanged(AbsRecyclableScrollRect scrollRect);
+
+        /// <summary>
+        /// <see cref="RecyclingSystem.OnScrollToNormalizedPosition(AbsRecyclableScrollRect, float)"/>
+        /// </summary>
+        /// <param name="scrollRect">滑动列表</param>
+        /// <param name="normalized">基准位置</param>
+        public abstract void OnScrollToNormalizedPosition(AbsRecyclableScrollRect scrollRect, float normalized);
     }
 }

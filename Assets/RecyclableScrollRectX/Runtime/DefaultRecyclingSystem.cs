@@ -38,17 +38,41 @@ namespace RecyclableScrollRectX
 
         public override IEnumerator InitCoroutine(Action onInitialized)
         {
-            yield return null;  // 等待一帧，保证获取到宽高
-            
+            Initialized = false;
+            Delegate.Clear();
+            yield return null; // 等待一帧，保证获取到宽高
+
             if (LayoutManager.Direction == Direction.Vertical)
                 Content.AnchorToTop();
             else
                 Content.AnchorToLeft();
 
             Content.anchoredPosition = Vector3.zero;
-            
-            // yield return null;  // 等待一帧，确保生效
 
+            SetContentSize();
+            LayoutManager.InitLayoutManger();
+            Initialized = true;
+
+            onInitialized?.Invoke();
+        }
+
+        public override void OnDataSetChanged(AbsRecyclableScrollRect scrollRect)
+        {
+            if (!Initialized) return;
+            if (LayoutManager == null) return;
+            Delegate.Clear();
+            SetContentSize();
+            LayoutManager.OnDataSetChanged(scrollRect);
+        }
+
+        public override void OnScrollToNormalizedPosition(AbsRecyclableScrollRect scrollRect, float normalized)
+        {
+            if (LayoutManager == null) return;
+            LayoutManager.OnScrollToNormalizedPosition(scrollRect, normalized);
+        }
+
+        protected virtual void SetContentSize()
+        {
             var contentSize = LayoutManager.CalcContentLengthOfSlidingDirection();
             var sizeDelta = Content.sizeDelta;
             sizeDelta = LayoutManager.Direction == Direction.Vertical
@@ -56,10 +80,12 @@ namespace RecyclableScrollRectX
                 : new Vector2(contentSize, sizeDelta.y);
 
             Content.sizeDelta = sizeDelta;
-
-            LayoutManager.InitLayoutManger();
-
-            onInitialized?.Invoke();
         }
+
+        #region 内部变量、属性
+
+        protected bool Initialized;
+
+        #endregion
     }
 }

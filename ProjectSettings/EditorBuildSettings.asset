@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/RecyclableScrollRectX/Demo/Scenes/Demo.unity
+    guid: ecad02a894cc54d47a5609e62ad4c166
   m_configObjects: {}

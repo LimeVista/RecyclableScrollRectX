@@ -23,7 +23,7 @@ namespace RecyclableScrollRectX.Demo
     [Serializable]
     public class DomeDataSource : RecyclableScriptableDataSource
     {
-        public override bool SingleZygoteMode => true;
+        public override bool SingleZygoteMode => false;
 
         public override int GetCellCount() => 100;
 

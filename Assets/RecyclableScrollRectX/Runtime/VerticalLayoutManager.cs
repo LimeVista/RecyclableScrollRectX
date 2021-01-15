@@ -81,7 +81,7 @@ namespace RecyclableScrollRectX
             var cellHeight = sizeDelta.y / sizeDelta.x * cellWidth;
 
             if (obj.scene.IsValid()) obj.SetActive(false);
-            
+
             var value = new Vector2(0.5f, 1);
             return new CellZygote(type, cellWidth, cellHeight, value, value, value, zygote);
         }
@@ -172,6 +172,79 @@ namespace RecyclableScrollRectX
                     BindCell(top, Mathf.Abs(dir), true);
                 }
             }
+        }
+
+        public override void OnDataSetChanged(AbsRecyclableScrollRect scrollRect)
+        {
+            OnScrollToNormalizedPosition(scrollRect, scrollRect.verticalNormalizedPosition);
+        }
+
+        public override void OnScrollToNormalizedPosition(AbsRecyclableScrollRect scrollRect, float normalized)
+        {
+            var contentHeight = Delegate.Content.rect.height;
+            var viewportHeight = Delegate.Viewport.rect.height;
+
+            var posY = 0f;
+            if (contentHeight > viewportHeight)
+            {
+                normalized = Mathf.Clamp(normalized, 0f, 1f);
+                normalized = 1f - normalized;
+                posY = normalized * (contentHeight - viewportHeight);
+            }
+
+            _prevOffset = posY;
+            var min = posY - _edge;
+            var max = posY + _edge + viewportHeight;
+
+            foreach (var item in Delegate.UsedPool)
+            {
+                var tf = item.Cell.Transform;
+                var edge = Mathf.Abs(tf.anchoredPosition.y) + tf.rect.height;
+                if (min <= edge) break;
+                _recyclingPool.Add(item);
+            }
+
+            RecyclingCellFromList();
+
+            for (var i = Delegate.UsedPool.Count - 1; i >= 0; i--)
+            {
+                var item = Delegate.UsedPool[i];
+                var tf = item.Cell.Transform;
+                var edge = Mathf.Abs(tf.anchoredPosition.y);
+                if (max >= edge) break;
+                _recyclingPool.Add(item);
+            }
+
+            RecyclingCellFromList();
+
+            var existMinIndex = int.MaxValue;
+            var existMaxIndex = int.MinValue;
+            if (Delegate.UsedPool.Count > 0)
+            {
+                existMinIndex = Delegate.LittleIndexFromUsedPool().Index;
+                existMaxIndex = Delegate.BigIndexFromUsedPool().Index;
+            }
+
+            var count = Delegate.DataSource.GetCellCount();
+            float offset = 0f, height;
+            for (var i = 0; i < count; i++, offset += height)
+            {
+                height = Delegate.GetCellZygote(i).FixedHeight;
+                if (min > offset + height) continue;
+                if (max < offset) break;
+                if (existMinIndex <= i && existMaxIndex >= i) continue;
+
+                var cell = Delegate.PopFromCachedPool(i);
+                var tf = cell.Transform;
+                var ap = tf.anchoredPosition;
+                ap.y = -offset;
+                tf.anchoredPosition = ap;
+                var cur = new CellItem(i, ap.y, cell);
+                Delegate.PushToUsedPool(cur);
+                Delegate.DataSource.OnBindCell(cell.Cell, i);
+            }
+
+            scrollRect.verticalNormalizedPosition = normalized;
         }
 
         #endregion

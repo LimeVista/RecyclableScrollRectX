@@ -62,20 +62,20 @@ namespace RecyclableScrollRectX
             }
         }
 
-        /// <summary>
-        /// 数据源发生大改变，重置整个滑动列表
-        /// </summary>
-        public void DataSetChanged()
+
+        public override void DataSetChanged()
         {
-            // TODO 需要实现位置、状态的保留
+            if (RecyclingSystem == null) return;
+            RecyclingSystem.OnDataSetChanged(this);
         }
 
-        /// <summary>
-        /// 刷新可见单元（会触发可视视图重新绑定）
-        /// 
-        /// 用于数据状态发生改变，但数据源未发生增删改
-        /// </summary>
-        public void RefreshVisibleCells()
+        public override void ScrollToNormalizedPosition(float normalized)
+        {
+            if (RecyclingSystem == null) return;
+            RecyclingSystem.OnScrollToNormalizedPosition(this, normalized);
+        }
+
+        public override void RefreshVisibleCells()
         {
             RecyclingSystemDelegate @delegate;
             if (RecyclingSystem == null || (@delegate = RecyclingSystem.InternalDelegate) == null) return;
