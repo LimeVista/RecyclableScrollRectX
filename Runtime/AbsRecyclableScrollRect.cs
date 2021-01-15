@@ -46,6 +46,25 @@ namespace RecyclableScrollRectX
         protected abstract RecyclingSystem CreateRecyclingSystem();
 
         /// <summary>
+        /// 数据源发生大改变，重置整个滑动列表
+        /// </summary>
+        public abstract void DataSetChanged();
+
+        /// <summary>
+        /// 功能类似于 <see cref="ScrollRect.SetNormalizedPosition(float, int)"/>
+        /// 区别在于这里只关注滑动方向
+        /// </summary>
+        /// <param name="normalized">基准位置</param>
+        public abstract void ScrollToNormalizedPosition(float normalized);
+
+        /// <summary>
+        /// 刷新可见单元（会触发可视视图重新绑定）
+        /// 
+        /// 用于数据状态发生改变，但数据源未发生增删改
+        /// </summary>
+        public abstract void RefreshVisibleCells();
+
+        /// <summary>
         /// 初始化
         /// </summary>
         protected virtual void Initialize()

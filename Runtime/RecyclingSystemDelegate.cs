@@ -83,6 +83,27 @@ namespace RecyclableScrollRectX
         /// 单元格原型（预制体）
         /// </summary>
         internal readonly Dictionary<int, CellZygote> Zygotes = new Dictionary<int, CellZygote>();
+        
+        /// <summary>
+        /// 清除数据
+        /// </summary>
+        public void Clear()
+        {
+            foreach (var item in UsedPool)
+            {
+                Object.Destroy(item.Cell.Transform.gameObject);
+            }
+
+            UsedPool.Clear();
+            
+            foreach (var ext in CachedPool)
+            {
+                Object.Destroy(ext.Transform.gameObject);
+            }
+
+            CachedPool.Clear();
+            Zygotes.Clear();
+        }
 
         /// <summary>
         /// 获取原型（预制体）

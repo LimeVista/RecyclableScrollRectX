@@ -194,6 +194,90 @@ namespace RecyclableScrollRectX
             }
         }
 
+        public override void OnDataSetChanged(AbsRecyclableScrollRect scrollRect)
+        {
+            OnScrollToNormalizedPosition(scrollRect, scrollRect.verticalNormalizedPosition);
+        }
+
+        public override void OnScrollToNormalizedPosition(AbsRecyclableScrollRect scrollRect, float normalized)
+        {
+            var dataSource = Delegate.DataSource;
+            var contentHeight = Delegate.Content.rect.height;
+            var viewportHeight = Delegate.Viewport.rect.height;
+            var posY = 0f;
+            if (contentHeight > viewportHeight)
+            {
+                normalized = Mathf.Clamp(normalized, 0f, 1f);
+                normalized = 1f - normalized;
+                posY = normalized * (contentHeight - viewportHeight);
+            }
+
+            _prevOffset = posY;
+            var min = posY - _edge;
+            var max = posY + _edge + viewportHeight;
+
+            var zygote = Delegate.GetCellZygote(0);
+            var cellHeight = zygote.FixedHeight;
+            var cellWidth = zygote.FixedWidth;
+
+            foreach (var item in Delegate.UsedPool)
+            {
+                var tf = item.Cell.Transform;
+                var edge = Mathf.Abs(tf.anchoredPosition.y) + tf.rect.height;
+                if (min <= edge) break;
+                _recyclingPool.Add(item);
+            }
+
+            RecyclingCellFromList();
+
+            for (var i = Delegate.UsedPool.Count - 1; i >= 0; i--)
+            {
+                var item = Delegate.UsedPool[i];
+                var tf = item.Cell.Transform;
+                var edge = Mathf.Abs(tf.anchoredPosition.y);
+                if (max >= edge) break;
+                _recyclingPool.Add(item);
+            }
+
+            RecyclingCellFromList();
+
+            var existMinIndex = int.MaxValue;
+            var existMaxIndex = int.MinValue;
+            if (Delegate.UsedPool.Count > 0)
+            {
+                existMinIndex = Delegate.LittleIndexFromUsedPool().Index;
+                existMaxIndex = Delegate.BigIndexFromUsedPool().Index;
+            }
+
+            var minRow = Mathf.Max((int) (min / cellHeight), 0);
+            var offset = cellHeight * minRow;
+            var index = minRow * Column;
+
+            var cellCount = dataSource.GetCellCount();
+            while (index < cellCount && max >= offset + cellHeight)
+            {
+                // 填充列
+                var row = index / Column;
+                while (row == index / Column && index < cellCount)
+                {
+                    if (existMinIndex <= index && existMaxIndex >= index)
+                    {
+                        index++;
+                        var curRow = index / Column;
+                        offset = curRow * cellHeight;
+                        continue;
+                    }
+
+                    var cur = PopCachedPoolPoolAndPushToUsedPool(index, cellWidth, cellHeight, row);
+                    dataSource.OnBindCell(cur.Cell.Cell, index);
+                    offset = Mathf.Abs(cur.Offset);
+                    index++;
+                }
+            }
+
+            scrollRect.verticalNormalizedPosition = normalized;
+        }
+
         #endregion
 
         #region 私有方法

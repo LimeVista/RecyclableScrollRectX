@@ -127,6 +127,21 @@ namespace RecyclableScrollRectX
         /// <returns>协程发生器</returns>
         public abstract IEnumerator InitCoroutine(Action onInitialized);
 
+        /// <summary>
+        /// <see cref="AbsRecyclableScrollRect.DataSetChanged()"/>
+        /// 如需使用，请调用 <see cref="AbsRecyclableScrollRect.DataSetChanged()"/>
+        /// </summary>
+        /// <param name="scrollRect">滑动列表</param>
+        public abstract void OnDataSetChanged(AbsRecyclableScrollRect scrollRect);
+
+        /// <summary>
+        /// <see cref="AbsRecyclableScrollRect.ScrollToNormalizedPosition(float)"/>
+        ///  如需使用，请调用 <see cref="AbsRecyclableScrollRect.ScrollToNormalizedPosition(float)"/>
+        /// </summary>
+        /// <param name="scrollRect">滑动列表</param>
+        /// <param name="normalized">基准位置</param>
+        public abstract void OnScrollToNormalizedPosition(AbsRecyclableScrollRect scrollRect, float normalized);
+
         #endregion
 
         #region 保护成员、属性
