@@ -23,14 +23,29 @@ namespace RecyclableScrollRectX
     /// </summary>
     public abstract class RecyclableScriptableDataSource : ScriptableObject, RecyclingSystem.IDataSource
     {
+        /// <summary>
+        /// <see cref="RecyclingSystem.IDataSource.SingleZygoteMode"/>
+        /// </summary>
         public abstract bool SingleZygoteMode { get; }
 
+        /// <summary>
+        /// <see cref="RecyclingSystem.IDataSource.GetCellCount"/>
+        /// </summary>
         public abstract int GetCellCount();
 
+        /// <summary>
+        /// <see cref="RecyclingSystem.IDataSource.GetCellZygote"/>
+        /// </summary>
         public abstract RectTransform GetCellZygote(int type);
 
+        /// <summary>
+        /// <see cref="RecyclingSystem.IDataSource.GetCellType"/>
+        /// </summary>
         public abstract int GetCellType(int index);
 
+        /// <summary>
+        /// <see cref="RecyclingSystem.IDataSource.OnBindCell"/>
+        /// </summary>
         public abstract void OnBindCell(RecyclingSystem.ICell cell, int index);
     }
 }

@@ -17,12 +17,10 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace RecyclableScrollRectX.Editor
+namespace RecyclableScrollRectXEditor
 {
     public static class RecyclableScrollViewMenu
     {
-        private const string PrefabPath = "Assets/RecyclableScrollRectX/Editor/Prefabs/RecyclableScrollView.prefab";
-
         [MenuItem("GameObject/UI/Recyclable Scroll View")]
         private static void CreateRecyclableScrollView()
         {
@@ -35,13 +33,24 @@ namespace RecyclableScrollRectX.Editor
 
             if (!selected) return;
 
-            var asset = AssetDatabase.LoadAssetAtPath(PrefabPath, typeof(GameObject)) as GameObject;
+            var asset = LoadPrefab("RecyclableScrollView");
             var item = Object.Instantiate(asset, selected.transform);
             item.name = "Recyclable Scroll View";
             item.transform.localPosition = Vector3.zero;
 
             Selection.activeGameObject = item;
             Undo.RegisterCreatedObjectUndo(item, "Create Recyclable Scroll View");
+        }
+
+
+        private static GameObject LoadPrefab(string name)
+        {
+            var fullPath = $"Packages/RecyclableScrollRectX/Editor/Prefabs/{name}.prefab";
+            var asset = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
+            if (asset != null) return asset;
+            fullPath = $"Assets/RecyclableScrollRectX/Editor/Prefabs/{name}.prefab";
+            asset = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
+            return asset;
         }
     }
 }

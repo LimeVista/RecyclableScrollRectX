@@ -22,7 +22,7 @@ namespace RecyclableScrollRectX
     /// <summary>
     /// 本项目的终极目标，可循环系统列表
     /// </summary>
-    public sealed class RecyclableScrollRect : AbsRecyclableScrollRect
+    public class RecyclableScrollRect : AbsRecyclableScrollRect
     {
         /// <summary>
         /// 布局模式
@@ -132,19 +132,27 @@ namespace RecyclableScrollRectX
             switch (layoutMode)
             {
                 case RecyclableScrollRectLayoutMode.Horizontal:
-                    manager = new HorizontalLayoutManager();
+                    manager = new HorizontalLayoutManager(horizontalSpace, verticalSpace);
                     break;
 
                 case RecyclableScrollRectLayoutMode.Vertical:
-                    manager = new VerticalLayoutManager();
+                    manager = new VerticalLayoutManager(horizontalSpace, verticalSpace);
                     break;
 
                 case RecyclableScrollRectLayoutMode.GridVertical:
-                    manager = new GridVerticalLayoutManager(Math.Max(1, orthogonalCount));
+                    manager = new GridVerticalLayoutManager(
+                        Math.Max(1, orthogonalCount),
+                        horizontalSpace,
+                        verticalSpace
+                    );
                     break;
 
                 case RecyclableScrollRectLayoutMode.GridHorizontal:
-                    manager = new GridHorizontalLayoutManager(Math.Max(1, orthogonalCount));
+                    manager = new GridHorizontalLayoutManager(
+                        Math.Max(1, orthogonalCount),
+                        horizontalSpace,
+                        verticalSpace
+                    );
                     break;
 
                 default:
@@ -159,6 +167,8 @@ namespace RecyclableScrollRectX
         [SerializeField] private RecyclableScrollRectLayoutMode layoutMode;
         [SerializeField] private RecyclableScriptableDataSource dataSource;
         [SerializeField] [HideInInspector] private int orthogonalCount;
+        [SerializeField] [HideInInspector] private float horizontalSpace;
+        [SerializeField] [HideInInspector] private float verticalSpace;
 
         #endregion
 

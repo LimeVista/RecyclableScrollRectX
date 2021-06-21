@@ -25,6 +25,22 @@ namespace RecyclableScrollRectX
     /// </summary>
     public class HorizontalLayoutManager : LayoutManager
     {
+        public HorizontalLayoutManager(float leftPadding, float rightPadding)
+        {
+            LeftPadding = leftPadding;
+            RightPadding = rightPadding;
+        }
+
+        /// <summary>
+        /// 左部空间间隔
+        /// </summary>
+        public float LeftPadding { get; }
+
+        /// <summary>
+        /// 右部空间间隔
+        /// </summary>
+        public float RightPadding { get; }
+
         #region 抽象实现
 
         public override Direction Direction => Direction.Horizontal;
@@ -34,39 +50,15 @@ namespace RecyclableScrollRectX
             var ds = Delegate.DataSource;
             var count = ds.GetCellCount();
             if (count < 1) return 0f;
-            if (ds.SingleZygoteMode)
-            {
-                var zygote = Delegate.GetCellZygote(0);
-                var rows = count;
-                return zygote.FixedWidth * rows;
-            }
-
-            var offset = 0f;
-            for (var i = 0; i < count; i++)
-            {
-                offset += Delegate.GetCellZygote(i).FixedWidth;
-            }
-
-            return offset;
+            // count = index + 1
+            var offset = CalcCellOffsetOfSlidingDirection(count);
+            return offset + LeftPadding + RightPadding;
         }
 
         public override Vector2 CalcCellOffset(RecyclingSystem.ICell cell, int index)
         {
-            if (index < 1) return Vector2.zero;
-            var ds = Delegate.DataSource;
-            if (ds.SingleZygoteMode)
-            {
-                var zygote = Delegate.GetCellZygote(0);
-                return new Vector2(zygote.FixedWidth * index, 0);
-            }
-
-            var offset = 0f;
-            for (var i = 0; i < index; i++)
-            {
-                offset += Delegate.GetCellZygote(i).FixedWidth;
-            }
-
-            return new Vector2(offset, 0);
+            if (index < 0) return Vector2.zero;
+            return new Vector2(CalcCellOffsetOfSlidingDirection(index) + LeftPadding, 0);
         }
 
         public override CellZygote OnProcessCellZygote(int type)
@@ -94,7 +86,7 @@ namespace RecyclableScrollRectX
             if (ds.GetCellCount() < 1) return;
 
             var maxX = rect.width * MinPoolCoverage;
-            var offset = 0f;
+            var offset = LeftPadding;
             var i = 0;
 
             var count = ds.GetCellCount();
@@ -224,7 +216,7 @@ namespace RecyclableScrollRectX
             }
 
             var count = Delegate.DataSource.GetCellCount();
-            float offset = 0f, width;
+            float offset = LeftPadding, width;
             for (var i = 0; i < count; i++, offset += width)
             {
                 width = Delegate.GetCellZygote(i).FixedWidth;
@@ -303,6 +295,25 @@ namespace RecyclableScrollRectX
             }
 
             _recyclingPool.Clear();
+        }
+
+        private float CalcCellOffsetOfSlidingDirection(int index)
+        {
+            if (index < 1) return 0;
+            var ds = Delegate.DataSource;
+            if (ds.SingleZygoteMode)
+            {
+                var zygote = Delegate.GetCellZygote(0);
+                return zygote.FixedWidth * index;
+            }
+
+            var offset = 0f;
+            for (var i = 0; i < index; i++)
+            {
+                offset += Delegate.GetCellZygote(i).FixedWidth;
+            }
+
+            return offset;
         }
 
         #endregion
