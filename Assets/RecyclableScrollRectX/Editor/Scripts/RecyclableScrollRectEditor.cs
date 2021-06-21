@@ -15,11 +15,12 @@
 //
 
 using System;
+using RecyclableScrollRectX;
 using UnityEditor;
 using UnityEditor.UI;
 using UnityEngine;
 
-namespace RecyclableScrollRectX.Editor
+namespace RecyclableScrollRectXEditor
 {
     [CustomEditor(typeof(RecyclableScrollRect), true)]
     [CanEditMultipleObjects]
@@ -28,6 +29,8 @@ namespace RecyclableScrollRectX.Editor
         private SerializedProperty _dataSource;
         private SerializedProperty _layoutMode;
         private SerializedProperty _orthogonalCount;
+        private SerializedProperty _verticalSpace;
+        private SerializedProperty _horizontalSpace;
         private RecyclableScrollRect _target;
 
         protected override void OnEnable()
@@ -36,6 +39,8 @@ namespace RecyclableScrollRectX.Editor
             _dataSource = serializedObject.FindProperty("dataSource");
             _layoutMode = serializedObject.FindProperty("layoutMode");
             _orthogonalCount = serializedObject.FindProperty("orthogonalCount");
+            _verticalSpace = serializedObject.FindProperty("verticalSpace");
+            _horizontalSpace = serializedObject.FindProperty("horizontalSpace");
             _target = (RecyclableScrollRect) target;
         }
 
@@ -47,17 +52,67 @@ namespace RecyclableScrollRectX.Editor
             switch (_target.LayoutMode)
             {
                 case RecyclableScrollRectLayoutMode.Vertical:
+                    if (EditorGUILayout.PropertyField(_horizontalSpace, new GUIContent("Top Padding")))
+                    {
+                        _horizontalSpace.floatValue = Math.Max(0, _horizontalSpace.floatValue);
+                    }
+
+                    if (EditorGUILayout.PropertyField(_verticalSpace, new GUIContent("Bottom Padding")))
+                    {
+                        _verticalSpace.floatValue = Math.Max(0, _verticalSpace.floatValue);
+                    }
+
                     break;
+
                 case RecyclableScrollRectLayoutMode.Horizontal:
+                    if (EditorGUILayout.PropertyField(_horizontalSpace, new GUIContent("Left Padding")))
+                    {
+                        _horizontalSpace.floatValue = Math.Max(0, _horizontalSpace.floatValue);
+                    }
+
+                    if (EditorGUILayout.PropertyField(_verticalSpace, new GUIContent("Right Padding")))
+                    {
+                        _verticalSpace.floatValue = Math.Max(0, _verticalSpace.floatValue);
+                    }
+
                     break;
+
                 case RecyclableScrollRectLayoutMode.GridVertical:
-                    EditorGUILayout.PropertyField(_orthogonalCount, new GUIContent("Columns"));
-                    _orthogonalCount.intValue = Math.Max(1, _orthogonalCount.intValue);
+                    if (EditorGUILayout.PropertyField(_orthogonalCount, new GUIContent("Columns")))
+                    {
+                        _orthogonalCount.intValue = Math.Max(1, _orthogonalCount.intValue);
+                    }
+
+                    if (EditorGUILayout.PropertyField(_verticalSpace, new GUIContent("Vertical Space")))
+                    {
+                        _verticalSpace.floatValue = Math.Max(0, _verticalSpace.floatValue);
+                    }
+
+                    if (EditorGUILayout.PropertyField(_horizontalSpace, new GUIContent("Horizontal Space")))
+                    {
+                        _horizontalSpace.floatValue = Math.Max(0, _horizontalSpace.floatValue);
+                    }
+
                     break;
+
                 case RecyclableScrollRectLayoutMode.GridHorizontal:
-                    EditorGUILayout.PropertyField(_orthogonalCount, new GUIContent("Rows"));
-                    _orthogonalCount.intValue = Math.Max(1, _orthogonalCount.intValue);
+                    if (EditorGUILayout.PropertyField(_orthogonalCount, new GUIContent("Rows")))
+                    {
+                        _orthogonalCount.intValue = Math.Max(1, _orthogonalCount.intValue);
+                    }
+
+                    if (EditorGUILayout.PropertyField(_verticalSpace, new GUIContent("Vertical Space")))
+                    {
+                        _verticalSpace.floatValue = Math.Max(0, _verticalSpace.floatValue);
+                    }
+
+                    if (EditorGUILayout.PropertyField(_horizontalSpace, new GUIContent("Horizontal Space")))
+                    {
+                        _horizontalSpace.floatValue = Math.Max(0, _horizontalSpace.floatValue);
+                    }
+
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }

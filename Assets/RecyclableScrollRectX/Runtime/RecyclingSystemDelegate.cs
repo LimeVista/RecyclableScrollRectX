@@ -83,7 +83,7 @@ namespace RecyclableScrollRectX
         /// 单元格原型（预制体）
         /// </summary>
         internal readonly Dictionary<int, CellZygote> Zygotes = new Dictionary<int, CellZygote>();
-        
+
         /// <summary>
         /// 清除数据
         /// </summary>
@@ -95,7 +95,7 @@ namespace RecyclableScrollRectX
             }
 
             UsedPool.Clear();
-            
+
             foreach (var ext in CachedPool)
             {
                 Object.Destroy(ext.Transform.gameObject);
@@ -149,7 +149,6 @@ namespace RecyclableScrollRectX
             {
                 var zygote = GetCellZygote(index);
                 cell = CreateCell(zygote);
-                cell.Transform.SetParent(Content, false);
             }
 
             return cell;
@@ -191,9 +190,9 @@ namespace RecyclableScrollRectX
         /// </summary>
         /// <param name="zygote">单元格原型（预制体）</param>
         /// <returns>单元格扩展结构</returns>
-        private static CellExt CreateCell(CellZygote zygote)
+        private CellExt CreateCell(CellZygote zygote)
         {
-            var cellObj = Object.Instantiate(zygote.Zygote.gameObject);
+            var cellObj = Object.Instantiate(zygote.Zygote.gameObject, Content, false);
             var cell = cellObj.GetComponent<RectTransform>();
             cellObj.name = "Cell";
             cell.anchoredPosition = Vector2.zero;

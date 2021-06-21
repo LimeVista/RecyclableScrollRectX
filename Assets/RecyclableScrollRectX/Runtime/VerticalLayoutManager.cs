@@ -25,6 +25,22 @@ namespace RecyclableScrollRectX
     /// </summary>
     public class VerticalLayoutManager : LayoutManager
     {
+        public VerticalLayoutManager(float topPadding, float bottomPadding)
+        {
+            TopPadding = topPadding;
+            BottomPadding = bottomPadding;
+        }
+
+        /// <summary>
+        /// 顶部空间间隔
+        /// </summary>
+        public float TopPadding { get; }
+
+        /// <summary>
+        /// 底部空间间隔
+        /// </summary>
+        public float BottomPadding { get; }
+
         #region 抽象实现
 
         public override Direction Direction => Direction.Vertical;
@@ -37,8 +53,7 @@ namespace RecyclableScrollRectX
             if (ds.SingleZygoteMode)
             {
                 var zygote = Delegate.GetCellZygote(0);
-                var rows = count;
-                return zygote.FixedHeight * rows;
+                return zygote.FixedHeight * count + TopPadding + BottomPadding;
             }
 
             var offset = 0f;
@@ -47,7 +62,7 @@ namespace RecyclableScrollRectX
                 offset += Delegate.GetCellZygote(i).FixedHeight;
             }
 
-            return offset;
+            return offset + TopPadding + BottomPadding;
         }
 
         public override Vector2 CalcCellOffset(RecyclingSystem.ICell cell, int index)
@@ -60,7 +75,7 @@ namespace RecyclableScrollRectX
                 return new Vector2(0, zygote.FixedHeight * index);
             }
 
-            var offset = 0f;
+            var offset = TopPadding;
             for (var i = 0; i < index; i++)
             {
                 offset += Delegate.GetCellZygote(i).FixedHeight;
@@ -94,7 +109,7 @@ namespace RecyclableScrollRectX
             if (ds.GetCellCount() < 1) return;
 
             var maxY = rect.height * MinPoolCoverage;
-            var offset = 0f;
+            var offset = TopPadding;
             var i = 0;
 
             var count = ds.GetCellCount();
@@ -188,7 +203,7 @@ namespace RecyclableScrollRectX
             if (contentHeight > viewportHeight)
             {
                 normalized = Mathf.Clamp(normalized, 0f, 1f);
-                normalized = 1f - normalized;
+                // normalized = 1f - normalized;
                 posY = normalized * (contentHeight - viewportHeight);
             }
 
@@ -226,7 +241,7 @@ namespace RecyclableScrollRectX
             }
 
             var count = Delegate.DataSource.GetCellCount();
-            float offset = 0f, height;
+            float offset = TopPadding, height;
             for (var i = 0; i < count; i++, offset += height)
             {
                 height = Delegate.GetCellZygote(i).FixedHeight;
@@ -244,7 +259,7 @@ namespace RecyclableScrollRectX
                 Delegate.DataSource.OnBindCell(cell.Cell, i);
             }
 
-            scrollRect.verticalNormalizedPosition = normalized;
+            scrollRect.verticalNormalizedPosition = 1f - normalized;
         }
 
         #endregion

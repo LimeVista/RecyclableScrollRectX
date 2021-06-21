@@ -26,16 +26,28 @@ namespace RecyclableScrollRectX
     /// </summary>
     public class GridHorizontalLayoutManager : LayoutManager
     {
-        public GridHorizontalLayoutManager(int row)
+        public GridHorizontalLayoutManager(int row, float horizontalSpace, float verticalSpace)
         {
             if (row < 1) row = 1;
             Row = row;
+            HorizontalSpace = horizontalSpace;
+            VerticalSpace = verticalSpace;
         }
 
         /// <summary>
         /// 行
         /// </summary>
-        public int Row { get; private set; }
+        public int Row { get; }
+
+        /// <summary>
+        /// 水平间隔
+        /// </summary>
+        public float HorizontalSpace { get; }
+
+        /// <summary>
+        /// 垂直间隔
+        /// </summary>
+        public float VerticalSpace { get; }
 
         public override float MinPoolCoverage => 1.5f;
 
@@ -55,7 +67,7 @@ namespace RecyclableScrollRectX
 
             var zygote = Delegate.GetCellZygote(0);
             var column = (count - 1) / Row + 1;
-            return zygote.FixedWidth * column;
+            return zygote.FixedWidth * column + (column + 1) * HorizontalSpace;
         }
 
         public override Vector2 CalcCellOffset(RecyclingSystem.ICell cell, int index)
@@ -67,8 +79,7 @@ namespace RecyclableScrollRectX
             }
 
             var zygote = Delegate.GetCellZygote(0);
-            var row = index / Row;
-            return new Vector2(zygote.FixedWidth * row, 0);
+            return CalcCellOffset(index, zygote.FixedWidth, zygote.FixedHeight);
         }
 
         public override CellZygote OnProcessCellZygote(int type)
@@ -79,7 +90,7 @@ namespace RecyclableScrollRectX
 
             // 等比缩放
             var sizeDelta = zygote.sizeDelta;
-            var cellHeight = System.Content.rect.height / Row;
+            var cellHeight = (System.Content.rect.height - VerticalSpace * (Row + 1)) / Row;
             var cellWidth = sizeDelta.x / sizeDelta.y * cellHeight;
 
             if (obj.scene.IsValid()) obj.SetActive(false);
@@ -105,7 +116,7 @@ namespace RecyclableScrollRectX
             var i = 0;
             while (i < count && (offset < maxX || i < MinCellCount))
             {
-                var cell = PopCachedPoolPoolAndPushToUsedPool(i, cellWidth, cellHeight, i / Row);
+                var cell = PopCachedPoolPoolAndPushToUsedPool(i, cellWidth, cellHeight);
                 ds.OnBindCell(cell.Cell.Cell, i);
                 i++;
                 offset = cell.Offset;
@@ -157,7 +168,7 @@ namespace RecyclableScrollRectX
                     var column = index / Row;
                     while (column == index / Row && index < cellCount)
                     {
-                        right = PopCachedPoolPoolAndPushToUsedPool(index, cellWidth, cellHeight, column);
+                        right = PopCachedPoolPoolAndPushToUsedPool(index, cellWidth, cellHeight);
                         dataSource.OnBindCell(right.Cell.Cell, index);
                         index++;
                     }
@@ -185,7 +196,7 @@ namespace RecyclableScrollRectX
                     var column = index / Row;
                     while (column == index / Row && index >= 0)
                     {
-                        left = PopCachedPoolPoolAndPushToUsedPool(index, cellWidth, cellHeight, column);
+                        left = PopCachedPoolPoolAndPushToUsedPool(index, cellWidth, cellHeight);
                         dataSource.OnBindCell(left.Cell.Cell, index);
                         index--;
                     }
@@ -266,7 +277,7 @@ namespace RecyclableScrollRectX
                         continue;
                     }
 
-                    var cur = PopCachedPoolPoolAndPushToUsedPool(index, cellWidth, cellHeight, col);
+                    var cur = PopCachedPoolPoolAndPushToUsedPool(index, cellWidth, cellHeight);
                     dataSource.OnBindCell(cur.Cell.Cell, index);
                     offset = Mathf.Abs(cur.Offset);
                     index++;
@@ -281,6 +292,18 @@ namespace RecyclableScrollRectX
         #region 私有方法
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private CellItem PopCachedPoolPoolAndPushToUsedPool(int index, float cellWidth, float cellHeight)
+        {
+            var cell = Delegate.PopFromCachedPool(index);
+            var tf = cell.Transform;
+            var ap = CalcCellOffset(index, cellWidth, cellHeight);
+            tf.anchoredPosition = ap;
+            var cur = new CellItem(index, ap.x, cell);
+            Delegate.PushToUsedPool(cur);
+            return cur;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RecyclingCellFromList()
         {
             if (_recyclingPool.Count < 1) return;
@@ -293,17 +316,13 @@ namespace RecyclableScrollRectX
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private CellItem PopCachedPoolPoolAndPushToUsedPool(int index, float cellWidth, float cellHeight, int column)
+        private Vector2 CalcCellOffset(int index, float cellWidth, float cellHeight)
         {
-            var cell = Delegate.PopFromCachedPool(index);
-            var tf = cell.Transform;
-            var ap = tf.anchoredPosition;
-            ap.x = cellWidth * column;
-            ap.y = -index % Row * cellHeight;
-            tf.anchoredPosition = ap;
-            var cur = new CellItem(index, ap.x, cell);
-            Delegate.PushToUsedPool(cur);
-            return cur;
+            var col = index / Row;
+            return new Vector2(
+                cellWidth * col + (col + 1) * HorizontalSpace,
+                -(index % Row * (cellHeight + VerticalSpace) + VerticalSpace)
+            );
         }
 
         #endregion
