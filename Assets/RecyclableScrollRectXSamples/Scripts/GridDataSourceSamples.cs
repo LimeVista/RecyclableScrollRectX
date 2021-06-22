@@ -16,10 +16,10 @@
 
 using UnityEngine;
 
-namespace RecyclableScrollRectX.Demo
+namespace RecyclableScrollRectX.Samples
 {
-    [CreateAssetMenu(menuName = "Dome/GridDomeDataSource")]
-    public class GridDomeDataSource : RecyclableScriptableDataSource
+    [CreateAssetMenu(menuName = "Samples/GridDomeDataSource")]
+    public class GridDataSourceSamples : RecyclableScriptableDataSource
     {
         public override bool SingleZygoteMode => true;
 

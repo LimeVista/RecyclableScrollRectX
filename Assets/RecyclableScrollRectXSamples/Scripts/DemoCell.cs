@@ -17,7 +17,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace RecyclableScrollRectX.Demo
+namespace RecyclableScrollRectX.Samples
 {
     public class DemoCell : MonoBehaviour, RecyclingSystem.ICell
     {

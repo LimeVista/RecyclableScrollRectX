@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/RecyclableScrollRectX/Demo/Scenes/Horizontal.unity
+    path: Assets/RecyclableScrollRectXSamples/Scenes/Horizontal.unity
     guid: ecad02a894cc54d47a5609e62ad4c166
   m_configObjects: {}

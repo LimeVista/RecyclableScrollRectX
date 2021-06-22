@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace RecyclableScrollRectX.Demo
+namespace RecyclableScrollRectX.Samples
 {
     public class RandomScroller : MonoBehaviour
     {

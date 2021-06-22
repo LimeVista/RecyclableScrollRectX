@@ -17,11 +17,11 @@
 using System;
 using UnityEngine;
 
-namespace RecyclableScrollRectX.Demo
+namespace RecyclableScrollRectX.Samples
 {
-    [CreateAssetMenu(menuName = "Dome/DomeDataSource")]
+    [CreateAssetMenu(menuName = "Samples/DomeDataSource")]
     [Serializable]
-    public class DomeDataSource : RecyclableScriptableDataSource
+    public class DataSourceSamples : RecyclableScriptableDataSource
     {
         public override bool SingleZygoteMode => false;
 
