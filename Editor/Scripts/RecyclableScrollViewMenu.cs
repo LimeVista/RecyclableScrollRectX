@@ -45,7 +45,7 @@ namespace RecyclableScrollRectXEditor
 
         private static GameObject LoadPrefab(string name)
         {
-            var fullPath = $"Packages/RecyclableScrollRectX/Editor/Prefabs/{name}.prefab";
+            var fullPath = $"Packages/com.limice.recyclable.scrollrect/Editor/Prefabs/{name}.prefab";
             var asset = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
             if (asset != null) return asset;
             fullPath = $"Assets/RecyclableScrollRectX/Editor/Prefabs/{name}.prefab";
