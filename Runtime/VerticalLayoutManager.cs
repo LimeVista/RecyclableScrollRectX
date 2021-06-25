@@ -191,7 +191,7 @@ namespace RecyclableScrollRectX
 
         public override void OnDataSetChanged(AbsRecyclableScrollRect scrollRect)
         {
-            OnScrollToNormalizedPosition(scrollRect, scrollRect.verticalNormalizedPosition);
+            OnScrollToNormalizedPosition(scrollRect, 1f - scrollRect.verticalNormalizedPosition);
         }
 
         public override void OnScrollToNormalizedPosition(AbsRecyclableScrollRect scrollRect, float normalized)
