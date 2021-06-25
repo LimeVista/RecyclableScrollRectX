@@ -7,8 +7,11 @@ namespace RecyclableScrollRectX.Samples
     {
         private void Start()
         {
-            // 点击
             button.onClick.AddListener(OnClicked);
+            if (dataSetChange != null)
+            {
+                dataSetChange.onClick.AddListener(OnDataSetChangedClicked);
+            }
         }
 
         private void OnClicked()
@@ -18,7 +21,10 @@ namespace RecyclableScrollRectX.Samples
             Debug.Log($"Scroll to: {value}");
         }
 
+        private void OnDataSetChangedClicked() { scrollRect.DataSetChanged(); }
+
         [SerializeField] private RecyclableScrollRect scrollRect;
         [SerializeField] private Button button;
+        [SerializeField] private Button dataSetChange;
     }
 }
