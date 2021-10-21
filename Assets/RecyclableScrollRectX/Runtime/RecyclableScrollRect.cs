@@ -22,7 +22,7 @@ namespace RecyclableScrollRectX
     /// <summary>
     /// 本项目的终极目标，可循环系统列表
     /// </summary>
-    public class RecyclableScrollRect : AbsRecyclableScrollRect
+    public class RecyclableScrollRect : AbsRecyclableScrollRect, AbsRecyclableScrollRect.IWithDataSource
     {
         /// <summary>
         /// 布局模式

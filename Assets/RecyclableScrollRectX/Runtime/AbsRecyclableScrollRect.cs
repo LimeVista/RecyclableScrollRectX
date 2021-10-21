@@ -25,6 +25,17 @@ namespace RecyclableScrollRectX
     public abstract class AbsRecyclableScrollRect : ScrollRect
     {
         /// <summary>
+        /// 用于判定是否存在数据源
+        /// </summary>
+        public interface IWithDataSource
+        {
+            /// <summary>
+            /// 数据源
+            /// </summary>
+            RecyclingSystem.IDataSource DataSource { get; }
+        }
+
+        /// <summary>
         /// <see cref="RecyclingSystem"/>
         /// </summary>
         protected RecyclingSystem RecyclingSystem;

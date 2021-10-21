@@ -61,6 +61,11 @@ namespace RecyclableScrollRectX
             if (!Initialized) return;
             if (LayoutManager == null) return;
             Delegate.Clear();
+            if (scrollRect is AbsRecyclableScrollRect.IWithDataSource d)
+            {
+                DataSource = d.DataSource;
+            }
+
             SetContentSize();
             LayoutManager.OnDataSetChanged(scrollRect);
         }
