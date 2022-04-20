@@ -14,6 +14,7 @@
 // along with this library.
 //
 
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -41,6 +42,20 @@ namespace RecyclableScrollRectX
         protected RecyclingSystem RecyclingSystem;
 
         /// <summary>
+        /// <see cref="OnInitialized"/>
+        /// </summary>
+        protected event Action<AbsRecyclableScrollRect> OnInitializedAction;
+
+        /// <summary>
+        /// 初始化完成监听（必须在初始化之前注册），也可用 <see cref="Initialized"/> 判断是否完成初始化
+        /// </summary>
+        public event Action<AbsRecyclableScrollRect> OnInitialized
+        {
+            add => OnInitializedAction += value;
+            remove => OnInitializedAction -= value;
+        }
+
+        /// <summary>
         /// 是否允许水平移动
         /// </summary>
         protected abstract bool AllowHorizontal { get; }
@@ -55,6 +70,11 @@ namespace RecyclableScrollRectX
         /// </summary>
         /// <returns><see cref="RecyclingSystem"/></returns>
         protected abstract RecyclingSystem CreateRecyclingSystem();
+
+        /// <summary>
+        /// 是否初始化
+        /// </summary>
+        public bool Initialized { get; protected set; }
 
         /// <summary>
         /// 数据源发生大改变，重置整个滑动列表
@@ -76,6 +96,11 @@ namespace RecyclableScrollRectX
         public abstract void RefreshVisibleCells();
 
         /// <summary>
+        /// 获取当前的 <see cref="RecyclingSystem"/>，如果未初始化时为空
+        /// </summary>
+        public RecyclingSystem CurrentRecyclingSystem => RecyclingSystem;
+
+        /// <summary>
         /// 初始化
         /// </summary>
         protected virtual void Initialize()
@@ -83,8 +108,12 @@ namespace RecyclableScrollRectX
             onValueChanged.RemoveListener(OnValueChanged);
             StartCoroutine(RecyclingSystem.InitCoroutine(() =>
             {
+                Initialized = true;
+
                 // 增加监听
                 onValueChanged.AddListener(OnValueChanged);
+
+                OnInitializedAction?.Invoke(this);
             }));
         }
 

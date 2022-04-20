@@ -2,7 +2,7 @@
   "name": "com.limice.recyclable.scrollrect",
   "displayName": "Recyclable ScrollRect X",
   "description": "A recyclable scroll view for Unity.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "unity": "2019.3",
   "license": "MIT License",
   "dependencies": {}
